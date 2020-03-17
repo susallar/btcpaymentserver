@@ -2,6 +2,8 @@
 
 <script type="text/x-template" id="bitcoin-lightning-method-checkout-template">
     <div>
+
+
         <div class="bp-view payment scan" id="scan" v-bind:class="{ 'active': currentTab == 'scan'}">
             <div class="wrapBtnGroup" v-bind:class="{ invisible: !srvModel.isLightning || !scanDisplayQr }">
                 <div class="btnGroupLnd">
@@ -27,12 +29,13 @@
                 </div>
             </div>
             <div class="payment__details__instruction__open-wallet" v-if="srvModel.invoiceBitcoinUrl">
-                <a class="payment__details__instruction__open-wallet__btn action-button" target="_top" v-bind:href="srvModel.invoiceBitcoinUrl">
+                <a class="payment__details__instruction__open-wallet__btn action-button" v-bind:href="srvModel.invoiceBitcoinUrl">
                     <span>{{$t("Open in wallet")}}</span>
                 </a>
             </div>
         </div>
-        <div class="bp-view payment manual-flow" id="copy" v-bind:class="{ 'active': currentTab == 'copy'}">
+       
+        <div class="bp-view payment manual-flow " id="copy" v-bind:class="{ 'active': currentTab == 'copy'}">
             <div class="manual__step-two__instructions">
                 <span i18n="">{{$t("CompletePay_Body", srvModel)}}</span>
             </div>
@@ -73,6 +76,9 @@
                 </div>
             </nav>
         </div>
+
+
+
         @if (Model.ChangellyEnabled || Model.CoinSwitchEnabled)
         {
             <div id="altcoins" class="bp-view payment manual-flow" v-bind:class="{ 'active': currentTab == 'altcoins'}">

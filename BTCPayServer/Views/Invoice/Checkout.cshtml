@@ -79,36 +79,41 @@
 
                     <div style="margin-top: 10px; text-align: center;">
                         @* Not working because of nsSeparator: false, keySeparator: false,
-                            {{$t("nested.lang")}} >>
+            {{$t("nested.lang")}} >>
                         *@
 
-                        <select asp-for="DefaultLang"
-                                class="cmblang reverse invisible"
-                                onkeypress="if(event.keyCode==13){ $(this).click();}"
-                                onchange="changeLanguage($(this).val())"
-                                asp-items="@langService.GetLanguages().Select((language) => new SelectListItem(language.DisplayName,language.Code, false))"></select>
+                        @*<select asp-for="DefaultLang"
+            class="cmblang reverse invisible"
+            onkeypress="if(event.keyCode==13){ $(this).click();}"
+            onchange="changeLanguage($(this).val())"
+            asp-items="@langService.GetLanguages().Select((language) => new SelectListItem(language.DisplayName,language.Code, false))"></select>*@
 
-                        <script>
-                            var languageSelectorPrettyDropdown;
-                            $(function () {
-                                // REVIEW: don't use initDropdown method but rather directly initialize select whenever you are using it
-                                $("#DefaultLang").val(startingLanguage);
-                                languageSelectorPrettyDropdown = initDropdown("#DefaultLang");
-                            });
+                        @*<script>
+                var languageSelectorPrettyDropdown;
+                $(function () {
+                    // REVIEW: don't use initDropdown method but rather directly initialize select whenever you are using it
+                    $("#DefaultLang").val(startingLanguage);
+                    languageSelectorPrettyDropdown = initDropdown("#DefaultLang");
+                });
 
-                            function initDropdown(selector) {
-                                return $(selector).prettyDropdown({
-                                    classic: false,
-                                    height: 32,
-                                    reverse: true,
-                                    hoverIntent: 5000
-                                });
-                            }
-                        </script>
+                function initDropdown(selector) {
+                    return $(selector).prettyDropdown({
+                        classic: false,
+                        height: 32,
+                        reverse: true,
+                        hoverIntent: 5000
+                    });
+                }
+            </script>*@
                     </div>
                     <div style="margin-top: 10px; text-align: center;" class="form-text small text-muted">
-                        <span>Powered by <a target="_blank" href="https://github.com/btcpayserver/btcpayserver">BTCPay Server</a></span>
+                        <span>قدرت گرفته از <a target="_blank" href="#"><img src="/img/logo.svg" alt="" width="32"></a></span>
                     </div>
+
+                    @*<div class="form-text small text-muted" style="margin-top: 10px; text-align: center;">
+                        <span>قدرت گرفته از <a href="#" target="_blank"><img src="/img/logo.svg" alt=""></a> </span>
+                    </div>*@
+
                 </div>
             </div>
         </div>

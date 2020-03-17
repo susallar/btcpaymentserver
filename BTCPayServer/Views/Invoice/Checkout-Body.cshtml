@@ -19,7 +19,7 @@
     <div class="timer-row" v-bind:class="{ 'expiring-soon': expiringSoon }">
         <div class="timer-row__progress-bar" v-bind:style="{ 'width': expirationPercentage+ '%' }"></div>
         <div class="timer-row__spinner" v-if="!invoiceUnpayable && !invoicePaid">
-            <partial name="Checkout-Spinner"/>
+            <partial name="Checkout-Spinner" />
         </div>
         <div class="timer-row__message">
             <span v-if="invoiceUnpayable">
@@ -36,121 +36,123 @@
     </div>
 </div>
 <div class="order-details">
-    <div class="currency-selection">
-        <div class="single-item-order__left">
-            <div style="font-weight: 600;" id="pay-with-text">
-                {{$t("Pay with")}}
+    <div class="wrapper-info">
+        <div class="currency-selection">
+            <div class="single-item-order__left">
+                <div style="font-weight: 600;" id="pay-with-text">
+                    {{$t("Pay with")}}
+                </div>
             </div>
-        </div>
-        <div class="single-item-order__right">
-            @if (Model.AvailableCryptos.Count > 1)
-            {
-                <div class="paywithRowRight cursorPointer" v-on:click="openPaymentMethodDialog">
-                    <span class="payment__currencies " v-show="!changingCurrencies">
-                        <img v-bind:src="srvModel.cryptoImage"/>
+            <div class="single-item-order__right">
+                @if (Model.AvailableCryptos.Count > 1)
+                {
+                    <div class="paywithRowRight cursorPointer" v-on:click="openPaymentMethodDialog">
+                        <span class="payment__currencies " v-show="!changingCurrencies">
+                            <img v-bind:src="srvModel.cryptoImage" />
+                            <span>{{srvModel.paymentMethodName}} ({{srvModel.cryptoCodeSrv}})</span>
+                            <span v-show="srvModel.isLightning">&#9889;</span>
+                            <span class="clickable_indicator fa fa-angle-right"></span>
+                        </span>
+                    </div>
+                    <div id="vexPopupDialog">
+                        <ul class="vexmenu">
+                            @foreach (var crypto in Model.AvailableCryptos)
+                            {
+                                <li class="vexmenuitem">
+                                    <a href="@crypto.Link" onclick="closePaymentMethodDialog('@crypto.PaymentMethodId');return false;">
+                                        <img alt="@crypto.PaymentMethodName" src="@crypto.CryptoImage" />
+                                        @crypto.PaymentMethodName
+                                        @(crypto.IsLightning ? Html.Raw("&#9889;") : null)
+                                        <span>@crypto.CryptoCode</span>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <div class="payment__currencies_noborder">
                         <span>{{srvModel.paymentMethodName}} ({{srvModel.cryptoCodeSrv}})</span>
                         <span v-show="srvModel.isLightning">&#9889;</span>
-                        <span class="clickable_indicator fa fa-angle-right"></span>
-                    </span>
+                        <img v-bind:src="srvModel.cryptoImage" />
+                    </div>
+                }
+                <div class="payment__spinner" v-show="changingCurrencies || loading">
+                    <partial name="Checkout-Spinner" />
                 </div>
-                <div id="vexPopupDialog">
-                    <ul class="vexmenu">
-                        @foreach (var crypto in Model.AvailableCryptos)
-                        {
-                            <li class="vexmenuitem">
-                                <a href="@crypto.Link" onclick="closePaymentMethodDialog('@crypto.PaymentMethodId');return false;">
-                                    <img alt="@crypto.PaymentMethodName" src="@crypto.CryptoImage"/>
-                                    @crypto.PaymentMethodName
-                                    @(crypto.IsLightning ? Html.Raw("&#9889;") : null)
-                                    <span>@crypto.CryptoCode</span>
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </div>
-            }
-            else
-            {
-                <div class="payment__currencies_noborder">
-                    <img v-bind:src="srvModel.cryptoImage"/>
-                    <span>{{srvModel.paymentMethodName}} ({{srvModel.cryptoCodeSrv}})</span>
-                    <span v-show="srvModel.isLightning">&#9889;</span>
-                </div>
-            }
-            <div class="payment__spinner" v-show="changingCurrencies || loading">
-                <partial name="Checkout-Spinner"/>
             </div>
         </div>
-    </div>
 
-    <div class="single-item-order buyerTotalLine" v-on:click="toggleLineItems" v-bind:class="{ 'expanded': lineItemsExpanded}">
-        <div class="single-item-order__left">
-            <div class="single-item-order__left__name">
-                {{ srvModel.storeName }}
+        <div class="single-item-order buyerTotalLine" v-bind:class="{ 'expanded': lineItemsExpanded}">
+            <div class="single-item-order__left">
+                <div class="single-item-order__left__name">
+                    @*{{ srvModel.storeName }}*@
+                    {{$t("Order Amount")}}
+                </div>
+                <div class="single-item-order__left__description">
+                    {{ srvModel.itemDesc }}
+                </div>
             </div>
-            <div class="single-item-order__left__description">
-                {{ srvModel.itemDesc }}
+            <div class="single-item-order__right">
+                <div class="single-item-order__right__btc-price" v-if="srvModel.status === 'paid'">
+                    <span>{{ srvModel.btcPaid }} {{ srvModel.cryptoCode }}</span>
+                </div>
+                <div class="single-item-order__right__btc-price" v-else>
+                    <span>{{ srvModel.btcDue }} {{ srvModel.cryptoCode }}</span>
+                </div>
+                <div class="single-item-order__right__ex-rate" v-if="srvModel.orderAmountFiat && srvModel.cryptoCode">
+                    <span v-if="srvModel.cryptoCodeSrv === 'Sats'">1 Sat = {{ srvModel.rate }}</span>
+                    <span v-else>1 {{ srvModel.cryptoCodeSrv }} = {{ srvModel.rate }}</span>
+                </div>
             </div>
+            @*<span class="fa fa-angle-double-down"></span>
+            <span class="fa fa-angle-double-up"></span>*@
         </div>
-        <div class="single-item-order__right">
-            <div class="single-item-order__right__btc-price" v-if="srvModel.status === 'paid'">
-                <span>{{ srvModel.btcPaid }} {{ srvModel.cryptoCode }}</span>
+        <line-items>
+            <div class="extraPayment" v-if="srvModel.status === 'new' && srvModel.txCount > 1">
+                {{$t("NotPaid_ExtraTransaction")}}
             </div>
-            <div class="single-item-order__right__btc-price" v-else>
-                <span>{{ srvModel.btcDue }} {{ srvModel.cryptoCode }}</span>
+            <div class="line-items" v-bind:class="{ 'expanded': lineItemsExpanded}">
+                <div class="line-items__item">
+                    <div class="line-items__item__label">{{$t("Order Amount")}}</div>
+                    <div class="line-items__item__value">{{srvModel.orderAmount}} {{ srvModel.cryptoCode }}</div>
+                </div>
+                <div class="line-items__item line-items_fiatvalue" v-if="srvModel.orderAmountFiat">
+                    <div class="line-items__item__label">&nbsp;</div>
+                    <div class="line-items__item__value single-item-order__right__ex-rate">
+                        {{srvModel.orderAmountFiat}}
+                    </div>
+                </div>
+                <div class="line-items__item" v-show="srvModel.networkFee > 0">
+                    <div class="line-items__item__label">
+                        <span>{{$t("Network Cost")}}</span>
+                    </div>
+                    <div class="line-items__item__value">
+                        <span v-if="srvModel.isMultiCurrency">
+                            {{ srvModel.networkFee }} {{ srvModel.cryptoCode }}
+                        </span>
+                        <span v-else>
+                            {{$t("txCount", {count: srvModel.txCount})}} x {{ srvModel.networkFee }} {{ srvModel.cryptoCode }}
+                        </span>
+                    </div>
+                </div>
+                <div class="line-items__item">
+                    <div class="line-items__item__label">
+                        <span>{{$t("Already Paid")}}</span>
+                    </div>
+                    <div class="line-items__item__value">-{{srvModel.btcPaid }} {{ srvModel.cryptoCode }}</div>
+                </div>
+                <div class="line-items__item line-items__item--total">
+                    <div class="line-items__item__label">{{$t("Due")}}</div>
+                    <div class="line-items__item__value">{{srvModel.btcDue}} {{ srvModel.cryptoCode }}</div>
+                </div>
             </div>
-            <div class="single-item-order__right__ex-rate" v-if="srvModel.orderAmountFiat && srvModel.cryptoCode">
-                <span v-if="srvModel.cryptoCodeSrv === 'Sats'">1 Sat = {{ srvModel.rate }}</span>
-                <span v-else>1 {{ srvModel.cryptoCodeSrv }} = {{ srvModel.rate }}</span>
-            </div>
-        </div>
-        <span class="fa fa-angle-double-down"></span>
-        <span class="fa fa-angle-double-up"></span>
+        </line-items>
     </div>
-    <line-items>
-        <div class="extraPayment" v-if="srvModel.status === 'new' && srvModel.txCount > 1">
-            {{$t("NotPaid_ExtraTransaction")}}
-        </div>
-        <div class="line-items" v-bind:class="{ 'expanded': lineItemsExpanded}">
-            <div class="line-items__item">
-                <div class="line-items__item__label">{{$t("Order Amount")}}</div>
-                <div class="line-items__item__value">{{srvModel.orderAmount}} {{ srvModel.cryptoCode }}</div>
-            </div>
-            <div class="line-items__item line-items_fiatvalue" v-if="srvModel.orderAmountFiat">
-                <div class="line-items__item__label">&nbsp;</div>
-                <div class="line-items__item__value single-item-order__right__ex-rate">
-                    {{srvModel.orderAmountFiat}}
-                </div>
-            </div>
-            <div class="line-items__item" v-show="srvModel.networkFee > 0">
-                <div class="line-items__item__label">
-                    <span>{{$t("Network Cost")}}</span>
-                </div>
-                <div class="line-items__item__value">
-                    <span v-if="srvModel.isMultiCurrency">
-                        {{ srvModel.networkFee }} {{ srvModel.cryptoCode }}
-                    </span>
-                    <span v-else>
-                        {{$t("txCount", {count: srvModel.txCount})}} x {{ srvModel.networkFee }} {{ srvModel.cryptoCode }}
-                    </span>
-                </div>
-            </div>
-            <div class="line-items__item">
-                <div class="line-items__item__label">
-                    <span>{{$t("Already Paid")}}</span>
-                </div>
-                <div class="line-items__item__value">-{{srvModel.btcPaid }} {{ srvModel.cryptoCode }}</div>
-            </div>
-            <div class="line-items__item line-items__item--total">
-                <div class="line-items__item__label">{{$t("Due")}}</div>
-                <div class="line-items__item__value">{{srvModel.btcDue}} {{ srvModel.cryptoCode }}</div>
-            </div>
-        </div>
-    </line-items>
-    <component
-        v-if="srvModel.uiSettings && srvModel.uiSettings.checkoutHeaderVueComponentName"
-        v-bind:srv-model="srvModel"
-        v-bind:is="srvModel.uiSettings.checkoutHeaderVueComponentName">
+    <component v-if="srvModel.uiSettings && srvModel.uiSettings.checkoutHeaderVueComponentName"
+               v-bind:srv-model="srvModel"
+               v-bind:is="srvModel.uiSettings.checkoutHeaderVueComponentName">
     </component>
 </div>
 
@@ -175,7 +177,7 @@
                     <button type="submit" class="action-button" style="margin-top: 15px;" v-bind:disabled="emailAddressFormSubmitting" v-bind:class="{ 'loading': emailAddressFormSubmitting }">
                         <span class="button-text">{{$t("Continue")}}</span>
                         <div class="loader-wrapper">
-                            <partial name="Checkout-Spinner"/>
+                            <partial name="Checkout-Spinner" />
                         </div>
                     </button>
                 </bp-loading-button>
@@ -183,10 +185,9 @@
         </form>
     </div>
     <div v-if="showPaymentUI">
-        <component
-            v-if="srvModel.uiSettings && srvModel.uiSettings.checkoutBodyVueComponentName"
-            v-bind:srv-model="srvModel"
-            v-bind:is="srvModel.uiSettings.checkoutBodyVueComponentName">
+        <component v-if="srvModel.uiSettings && srvModel.uiSettings.checkoutBodyVueComponentName"
+                   v-bind:srv-model="srvModel"
+                   v-bind:is="srvModel.uiSettings.checkoutBodyVueComponentName">
         </component>
     </div>
 
@@ -232,7 +233,7 @@
                 <div class="expired__text expired__text__smaller">
                     <span class="expired__text__bullet">{{$t("Invoice ID")}}</span>:
                     {{srvModel.invoiceId}}
-                    <br/>
+                    <br />
                     <span class="expired__text__bullet">{{$t("Order ID")}}</span>:
                     {{srvModel.orderId}}
                 </div>
